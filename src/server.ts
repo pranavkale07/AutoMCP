@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import path from 'path';
 import { config } from './config/env';
 import routes from './api/routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
@@ -12,25 +13,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Initialize storage
 initializeStorage().catch(console.error);
 
-// Routes
+// API Routes
 app.use('/api', routes);
 
-// Root route
+// Root route - serve frontend
 app.get('/', (req, res) => {
-  res.json({
-    message: 'AutoMCP API Server',
-    version: '1.0.0',
-    endpoints: {
-      health: '/api/health',
-      upload: 'POST /api/upload',
-      generate: 'POST /api/generate',
-      download: 'GET /api/download/:id',
-      status: 'GET /api/status/:id',
-    },
-  });
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Error handling

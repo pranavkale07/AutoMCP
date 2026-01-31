@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoMCP - Generate MCP Servers from API Docs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AutoMCP</h1>
+            <p class="subtitle">Generate MCP servers from OpenAPI/Swagger documentation</p>
+        </header>
+
+        <main>
+            <!-- Step 1: Upload -->
+            <section id="upload-section" class="card">
+                <h2>Step 1: Upload API Documentation</h2>
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="file-input" accept=".json,.yaml,.yml" hidden>
+                    <div class="upload-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Click to upload or drag and drop</p>
+                        <p class="file-types">OpenAPI JSON/YAML, Swagger, or Postman Collection</p>
+                    </div>
+                </div>
+                <div id="file-info" class="file-info hidden">
+                    <span id="file-name"></span>
+                    <button id="remove-file" class="btn-remove">✕</button>
+                </div>
+                <button id="upload-btn" class="btn btn-primary hidden" disabled>Upload File</button>
+            </section>
+
+            <!-- Step 2: Generate -->
+            <section id="generate-section" class="card hidden">
+                <h2>Step 2: Generate MCP Server</h2>
+                <div id="file-metadata" class="metadata"></div>
+                <button id="generate-btn" class="btn btn-primary">Generate MCP Server</button>
+            </section>
+
+            <!-- Step 3: Status -->
+            <section id="status-section" class="card hidden">
+                <h2>Step 3: Generation Status</h2>
+                <div id="status-content">
+                    <div class="status-indicator">
+                        <div class="spinner" id="spinner"></div>
+                        <p id="status-message">Generating MCP server...</p>
+                    </div>
+                    <div id="progress-details" class="progress-details"></div>
+                </div>
+            </section>
+
+            <!-- Step 4: Download -->
+            <section id="download-section" class="card hidden">
+                <h2>Step 4: Download Package</h2>
+                <div id="download-content" class="download-content">
+                    <div class="success-icon">✅</div>
+                    <h3>MCP Server Generated Successfully!</h3>
+                    <div id="package-info" class="package-info"></div>
+                    <button id="download-btn" class="btn btn-success">Download ZIP Package</button>
+                    <button id="reset-btn" class="btn btn-secondary">Generate Another</button>
+                </div>
+            </section>
+
+            <!-- Error Display -->
+            <section id="error-section" class="card error-card hidden">
+                <h2>Error</h2>
+                <p id="error-message"></p>
+                <button id="dismiss-error" class="btn btn-secondary">Dismiss</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built with ❤️ for the hackathon | Powered by Gemini AI</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

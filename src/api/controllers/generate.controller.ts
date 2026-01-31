@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import { readUploadedFile, createGeneratedPackageDir, saveGeneratedPackageMetadata, getGeneratedPackagePath } from '../../utils/file-storage';
 import { parseOpenAPI } from '../../parsers/openapi-parser';
 import { transformAPI } from '../../transformers/api-transformer';
@@ -139,6 +140,8 @@ export async function generateMCPServer(
         packagePath: packageInfo.packagePath,
         zipPath: packageInfo.zipPath,
         downloadUrl: `/api/download/${fileId}`,
+        toolsGenerated: transformedAPI.endpoints.length,
+        packageName: packageInfo.packagePath.split(path.sep).pop() || 'mcp-server',
       },
     });
   } catch (error: any) {
