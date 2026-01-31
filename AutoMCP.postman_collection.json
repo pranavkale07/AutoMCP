@@ -1,0 +1,353 @@
+{
+	"info": {
+		"_postman_id": "automcp-api-collection",
+		"name": "AutoMCP API",
+		"description": "Postman collection for AutoMCP - Generate MCP servers from OpenAPI documentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "Check if the API server is running and healthy"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload OpenAPI File",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    if (response.data && response.data.fileId) {",
+							"        pm.collectionVariables.set('file_id', response.data.fileId);",
+							"        console.log('File ID saved:', response.data.fileId);",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "Upload OpenAPI JSON or YAML file"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/upload",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"upload"
+					]
+				},
+				"description": "Upload an OpenAPI 3.x specification file (JSON or YAML). Returns file ID for generation."
+			},
+			"response": []
+		},
+		{
+			"name": "Generate MCP Server",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const response = pm.response.json();",
+							"    if (response.data && response.data.packageId) {",
+							"        pm.collectionVariables.set('package_id', response.data.packageId);",
+							"        console.log('Package ID saved:', response.data.packageId);",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fileId\": \"{{file_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/generate",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"generate"
+					]
+				},
+				"description": "Generate MCP server from uploaded OpenAPI file. Requires fileId from upload endpoint. This may take some time as it uses Gemini API."
+			},
+			"response": []
+		},
+		{
+			"name": "Check Package Status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/status/{{package_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"status",
+						"{{package_id}}"
+					]
+				},
+				"description": "Check the status of a generated MCP server package. Returns whether the package exists and is ready for download."
+			},
+			"response": []
+		},
+		{
+			"name": "Download MCP Server Package",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/download/{{package_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"download",
+						"{{package_id}}"
+					]
+				},
+				"description": "Download the generated MCP server package as a ZIP file. The package contains a complete, ready-to-use MCP server."
+			},
+			"response": []
+		},
+		{
+			"name": "Complete Flow - Upload and Generate",
+			"item": [
+				{
+					"name": "1. Upload File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.fileId) {",
+									"        pm.collectionVariables.set('file_id', response.data.fileId);",
+									"        console.log('✅ File uploaded. File ID:', response.data.fileId);",
+									"        console.log('📋 API:', response.data.api.title);",
+									"        console.log('🔌 Endpoints:', response.data.api.endpointsCount);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Upload pet-store-openapi.json"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Generate MCP Server",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.packageId) {",
+									"        pm.collectionVariables.set('package_id', response.data.packageId);",
+									"        console.log('✅ MCP server generated!');",
+									"        console.log('📦 Package ID:', response.data.packageId);",
+									"        console.log('⬇️  Download URL:', response.data.downloadUrl);",
+									"    }",
+									"} else {",
+									"    console.log('❌ Generation failed:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileId\": \"{{file_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Check Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/status/{{package_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"status",
+								"{{package_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Download Package",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/download/{{package_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"download",
+								"{{package_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Complete workflow: Upload OpenAPI file → Generate MCP server → Check status → Download package"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "file_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "package_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
