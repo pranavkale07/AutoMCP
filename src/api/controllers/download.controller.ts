@@ -33,8 +33,22 @@ export async function downloadPackage(
       return;
     }
 
-    // Get ZIP file path
-    const zipPath = `${getGeneratedPackagePath(id)}.zip`;
+    // Get the package directory
+    const packageDir = getGeneratedPackagePath(id);
+    
+    // Find the ZIP file in the package directory
+    const files = await fs.readdir(packageDir);
+    const zipFile = files.find(f => f.endsWith('.zip'));
+    
+    if (!zipFile) {
+      res.status(404).json({
+        status: 'error',
+        message: 'ZIP file not found',
+      });
+      return;
+    }
+    
+    const zipPath = path.join(packageDir, zipFile);
 
     try {
       // Check if ZIP file exists
@@ -83,14 +97,23 @@ export async function getPackageStatus(
     }
 
     const packageExists = await generatedPackageExists(id);
-    const zipPath = `${getGeneratedPackagePath(id)}.zip`;
     
     let zipExists = false;
-    try {
-      await fs.access(zipPath);
-      zipExists = true;
-    } catch {
-      zipExists = false;
+    let zipPath = null;
+    
+    if (packageExists) {
+      try {
+        const packageDir = getGeneratedPackagePath(id);
+        const files = await fs.readdir(packageDir);
+        const zipFile = files.find(f => f.endsWith('.zip'));
+        if (zipFile) {
+          zipPath = path.join(packageDir, zipFile);
+          await fs.access(zipPath);
+          zipExists = true;
+        }
+      } catch {
+        zipExists = false;
+      }
     }
 
     res.status(200).json({

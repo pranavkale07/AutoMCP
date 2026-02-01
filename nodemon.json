@@ -1,0 +1,15 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": [
+    "src/**/*.test.ts",
+    "node_modules",
+    "dist",
+    "temp",
+    "public/**/*",
+    "*.log",
+    "*.md"
+  ],
+  "exec": "ts-node src/server.ts",
+  "delay": 1000
+}

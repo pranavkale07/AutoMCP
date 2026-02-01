@@ -118,7 +118,7 @@ async function handleUpload() {
         state.uploadMetadata = data.data.api;
 
         // Show generate section
-        displayFileMetadata(data.metadata);
+        displayFileMetadata(data.data.api);
         generateSection.classList.remove('hidden');
         uploadBtn.textContent = 'Upload File';
         uploadBtn.disabled = false;
